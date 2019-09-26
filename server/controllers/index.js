@@ -11,7 +11,7 @@ module.exports = {
     get: function (req, res) {
       //create a promise
       // promise instantiated with req
-        // models.get()
+      // models.get()
       // with a then that gives res.statuscode and data
     },
     post: function (req, res) {}
