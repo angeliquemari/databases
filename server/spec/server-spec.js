@@ -68,7 +68,7 @@ describe('Persistent Node Chat Server', function() {
   it('Should output all messages from the DB', function(done) {
     // Let's insert a message into the db
     // insert room into db
-    var queryString = "SELECT * FROM messages";
+    var queryString = 'SELECT * FROM messages';
     // select
     //   m.text,
     //   r.roomname
