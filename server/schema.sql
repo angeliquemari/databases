@@ -1,8 +1,6 @@
--- drop database chat;
--- CREATE DATABASE chat;
-
+drop database chat;
+CREATE DATABASE chat;
 USE chat;
-
 
 drop table if exists messages;
 drop table if exists friends;
@@ -21,7 +19,7 @@ create table rooms (
 
 create table messages (
   id int auto_increment primary key,
-  message varchar(280),
+  text varchar(280),
   user_id int not null,
   room_id int not null,
   created_at timestamp default current_timestamp,

@@ -8,7 +8,11 @@ module.exports = {
 
   users: {
     // Ditto as above.
-    get: function () {},
+    get: function () {
+      // promise instantiated
+      // get all usernames from db
+      // when promise resolves returns  data
+    },
     post: function () {}
   }
 };
