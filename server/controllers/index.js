@@ -6,7 +6,8 @@ module.exports = {
     get: function (req, res) {
       return models.messages.get()
         .then ((data) => {
-          res.status(200).send(data).end();
+          res.set(headers).status(200).send(data).end();
+          // res.status(200).send(data).end();
           // console.log(data);
         })
         .catch ((err) => {
