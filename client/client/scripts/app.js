@@ -17,18 +17,21 @@ var App = {
 
 
     // Poll for new messages every 3 sec
-    setInterval(App.fetch, 3000);
-      },
+    setInterval(App.fetch, 20000);
+  },
 
   fetch: function(callback = ()=>{}) {
     Parse.readAll((data) => {
+      if (!data || !data.length) { return; }
 
+      Rooms.update(data, RoomsView.render);
+      Messages.update(data, MessagesView.render);
       // Don't bother to update if we have no messages
-      if (!data.results || !data.results.length) { return; }
+      // if (!data.results || !data.results.length) { return; }
 
-      Rooms.update(data.results, RoomsView.render);
-      Messages.update(data.results, MessagesView.render);
-      
+      // Rooms.update(data.results, RoomsView.render);
+      // Messages.update(data.results, MessagesView.render);
+
       callback();
     });
   },
