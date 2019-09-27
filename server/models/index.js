@@ -1,119 +1,65 @@
 var Promise = require('bluebird');
-var db = require('../db');
-var query = Promise.promisify(db.dbConnection.query);
-
-var queryForId = function(message, type) {
-  let table;
-  let name;
-  if (type === 'user') {
-    table = 'users';
-    name = 'username';
-  }
-  if (type === 'room') {
-    table = 'rooms';
-    name = 'roomname';
-  }
-  let query = `
-    select id
-    from ${table}
-    where ${name} = '${message[name]}'
-    `;
-  return query(query, []);
-};
-
-var insertNewRecord = function(message, type) {
-  let table;
-  let name;
-  if (type === 'user') {
-    table = 'users';
-  }
-  if (type === 'room') {
-    table = 'rooms';
-    name = 'roomname';
-  }
-  let query = `
-    insert into ${table}(${name})
-      values('${message[name]}')`;
-  return query(query, []);
-};
+var db = Promise.promisifyAll(require('../db').dbConnection);
 
 module.exports = {
   messages: {
     get: function () {
-      return new Promise((res, rej) => {
-        var queryString = `
-          select
-            m.text,
-            u.username,
-            r.roomname
-          from messages as m
-            join users as u
-              on m.user_id = u.id
-            join rooms as r
-              on m.room_id = r.id
-          `;
-        var queryArgs = [];
-        db.dbConnection.query(queryString, queryArgs, function (err, results) {
-          if (err) {
-            rej (err);
-          } else {
-            res (results);
-          }
-        });
-      });
-    }, // a function which produces all the messages
+      var getMessages = `
+        select
+          m.text,
+          u.username,
+          r.roomname
+        from messages as m
+          join users as u
+            on m.user_id = u.id
+          join rooms as r
+            on m.room_id = r.id`;
+      return db.queryAsync(getMessages);
+    },
     post: function (message) {
-      return new Promise((res, rej) => {
-        queryForId(message, 'user')
-          .then((userId) => {
-            if (userId.length > 0) {
-              return resolve(message, userId);
-            }
-            return reject(message);
-          });
-      })
-        .catch((message) => {
-          insertNewRecord(message, 'user')
-            .then(
-              queryForId(message, 'user')
-            );
+      return module.exports.users.getUserId(message.username)
+        .then((user) => {
+          if (user.length > 0) {
+            return Promise.resolve(user[0].id);
+          } else {
+            return Promise.reject(message.username);
+          }
         })
-        .then((message, userId) => {
-          userId = userId[0].id;
-          queryForId(message, 'room')
-            .then((roomId) => {
-              if (roomId.length > 0) {
-                return resolve(message, roomId);
-              }
-              return reject(message);
-            });
-        })
-        .catch((message) => {
-          insertNewRecord(message, 'room')
-            .then(
-              queryForId(message, 'room')
-            );
-        })
-        .then((message, roomId) => {
-          roomId = roomId[0].id;
-          let query = `
+        .catch((username) => {
+          return module.exports.users.post(username);
+        }) // ideally, check for and maybe add new room after this
+        .then((user) => {
+          var userId = user.insertId || user; // insertId for newly created user
+          var insertMessage = `
             insert into messages(text, user_id, room_id)
-              values('${message.text}', ${userId}, ${roomId})
-            `;
-          query(query, []);
+              values('${message.text}', ${userId}, 1)`; // hard-code roomId for now
+          return db.queryAsync(insertMessage);
         });
     }
   },
 
   users: {
-    // Ditto as above.
     get: function () {
-      // promise instantiated
-      // get all usernames from db
-      // when promise resolves returns  data
+      var getUsers = `
+        select
+          id as user_id,
+          username
+        from users`;
+      return db.queryAsync(getUsers);
     },
-    post: function () {}
+    getUserId: function (username) {
+      var getUserId = `
+        select
+          id
+        from users
+        where username = '${username}'`;
+      return db.queryAsync(getUserId);
+    },
+    post: function (username) {
+      var insertUser = `
+        insert into users(username)
+          values('${username}')`;
+      return db.queryAsync(insertUser);
+    }
   }
 };
-
-

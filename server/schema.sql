@@ -1,6 +1,6 @@
 drop database chat;
-CREATE DATABASE chat;
-USE chat;
+create database chat;
+use chat;
 
 drop table if exists messages;
 drop table if exists friends;
@@ -43,19 +43,20 @@ create table friends (
     references users (id)
 );
 
--- dummy data
-insert into users(username) values('BrewBeast');
-insert into rooms(roomname) values('evillair');
-insert into messages(text, user_id, room_id) values('minions assemble', 1, 1);
+-- test data
+-- insert into users(username) values('BrewBeast');
+-- insert into rooms(roomname) values('evillair');
+-- insert into messages(text, user_id, room_id) values('minions assemble', 1, 1);
 
-insert into users(username) values('SillyString');
-insert into messages(text, user_id, room_id) values('oh! hi!', 2, 1);
+-- insert into users(username) values('SillyString');
+-- insert into messages(text, user_id, room_id) values('oh! hi!', 2, 1);
 
-insert into users(username) values('anon');
-insert into rooms(roomname) values('lobby');
-insert into messages(text, user_id, room_id) values("i'm all alone!", 3, 2);
+-- insert into users(username) values('anon');
+-- insert into rooms(roomname) values('lobby');
+-- insert into messages(text, user_id, room_id) values("i'm all alone!", 3, 2);
 
 /*  Execute this file from the command line by typing:
  *    mysql -u root < server/schema.sql
- *  to create the database and the tables.*/
-
+ *  to create the database and the tables.
+ *  Note: ran this locally but with the addition of `-p` after `root`
+ */

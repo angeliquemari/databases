@@ -4,40 +4,42 @@ var headers = require('../cors');
 module.exports = {
   messages: {
     get: function (req, res) {
-      return models.messages.get()
+      models.messages.get()
         .then ((data) => {
           res.set(headers).status(200).send(data).end();
-          // res.status(200).send(data).end();
           // console.log(data);
         })
         .catch ((err) => {
-          console.log(err);
+          // console.log(err);
+          res.set(headers).status(500).end();
         });
-    }, // a function which handles a get request for all messages
+    },
     post: function (req, res) {
-      // console.log(req.body);
       models.messages.post(req.body);
-      res.end();
-      // models.messages.post(req);
-      // return models.messages.post(req)
-      //   .then (() => {
-      //     res.status(200).end();
-      //   })
-      //   .catch((err) => {
-      //     console.log(err);
-      //   });
-    } // a function which handles posting a message to the database
+      res.set(headers).status(200).end();
+    }
   },
 
   users: {
-    // Ditto as above
     get: function (req, res) {
-      //create a promise
-      // promise instantiated with req
-      // models.get()
-      // with a then that gives res.statuscode and data
+      models.users.get(req.body)
+        .then ((data) => {
+          res.set(headers).status(200).send(data).end();
+        })
+        .catch ((err) => {
+          // console.log(err);
+          res.set(headers).status(500).end();
+        });
     },
-    post: function (req, res) {}
+    post: function (req, res) {
+      models.users.post(req.body)
+        .then(() => {
+          res.set(headers).status(200).end();
+        })
+        .catch((err) => {
+          // console.log(err);
+          res.set(headers).status(200).end();
+        });
+    }
   }
 };
-
